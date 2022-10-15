@@ -77,7 +77,7 @@ export default function Reservation() {
         <For each={groupedSegments()}>{(group, i) =>
         <>
             <h2>{dayjs(group.date).format('DD.MM.YYYY')}</h2>
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 10px">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px">
                 <For each={group.segments}>{(segment, i) =>
                     <div style="border: 3px outset darkblue; padding: 10px; background-color: #146ebd">
                         <div>

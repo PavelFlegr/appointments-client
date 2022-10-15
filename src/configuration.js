@@ -3,11 +3,13 @@ import {createSignal, onMount} from "solid-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js"
 import duration from "dayjs/plugin/duration.js"
+import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import TimePicker from "./timePicker.component";
 import axios from "axios"
 
 dayjs.extend(utc)
 dayjs.extend(duration)
+dayjs.extend(customParseFormat)
 
 export default function Configuration() {
     const [breaks, setBreaks] = createSignal([])
@@ -54,16 +56,20 @@ export default function Configuration() {
         }])
     }
 
+    function formatTime(time) {
+        console.log(dayjs(time, 'HH:mm'))
+        return dayjs(time, 'HH:mm').utc().format('HH:mm:ss')
+    }
+
     async function createAppointment() {
         const [h, m] = length().split(":")
-        console.log(dayjs.duration({h, m}))
         const appointment = {
             name: name(),
             volume: volume(),
             length: dayjs.duration({h, m}),
             start: dayjs(bounds().start).utc().toISOString(),
             end: dayjs(bounds().end).utc().toISOString(),
-            breaks: breaks().map(breakData => ({start: breakData.start.time(), end: breakData.end.time()})),
+            breaks: breaks().map(breakData => ({start: formatTime(breakData.start.time()), end: formatTime(breakData.end.time())})),
             exclude: []
         }
 
