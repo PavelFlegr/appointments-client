@@ -148,7 +148,7 @@ export default function Configuration() {
             <TimePicker name="Session Length" model={{time: length, setTime: setLength}}/>
         </div>
         <label for="duration">Select total duration</label>
-        <input id="duration"/>
+        <input id="duration" style="width: 300px"/>
         <div>
             <h2>Breaks</h2>
             <button onClick={() => addBreak()}>Add break</button>

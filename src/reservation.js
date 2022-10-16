@@ -104,7 +104,7 @@ export default function Reservation() {
             <input value={email()} onChange={e=>setEmail(e.currentTarget.value)} type="email"></input>
         </div>
         <h4>Reservation</h4>
-        <div>{dayjs(selected().date).format('DD.MM.YYYY')}</div>
+        <div>{dayjs(selected().start).format('DD.MM.YYYY')}</div>
         <div>{dayjs(selected().start).format("HH:mm")} - {dayjs(selected().end).format("HH:mm")}</div>
         <div>
             <button onClick={finishReservation}>Confirm Reservation</button>
