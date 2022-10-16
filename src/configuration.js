@@ -7,6 +7,8 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import TimePicker from "./timePicker.component";
 import axios from "axios"
 import {useNavigate} from "@solidjs/router";
+import fileDownload from "js-file-download";
+import Papa from "papaparse"
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -106,9 +108,28 @@ export default function Configuration() {
             await axios.delete(`api/appointment/${id}`, createBearer())
             await getAppointments()
         } catch(e) {
-            console.log(e)
             if(e.response.status=== 401) {
                 navigate('/login', {replace: true})
+            }
+        }
+    }
+
+    async function downloadReservations(id, name) {
+        try {
+            const response = await axios.get(`/api/appointment/${id}/reservations`, {...createBearer()})
+            console.log(response.data)
+            const pretty = response.data.map(reservation => ({
+                ...reservation,
+                start: dayjs(reservation.start).format(format),
+                end: dayjs(reservation.end).format(format),
+            }))
+            fileDownload(Papa.unparse(pretty), `${name}.csv`)
+        } catch(e) {
+            if(e.response.status=== 401) {
+                navigate('/login', {replace: true})
+            }
+            else {
+                setMessage({color: 'darkred', text: "couldn't download reservations"})
             }
         }
     }
@@ -148,6 +169,7 @@ export default function Configuration() {
                 <th>start</th>
                 <th>end</th>
                 <th>link</th>
+                <th>reservations</th>
             </tr>
             </thead>
             <tbody>
@@ -157,6 +179,7 @@ export default function Configuration() {
                     <td>{dayjs(appointment.start).format(format)}</td>
                     <td>{dayjs(appointment.end).format(format)}</td>
                     <td><a href={`/reserve/${appointment.id}`} target="_blank">link</a></td>
+                    <td><a onClick={() => downloadReservations(appointment.id, appointment.name)} href="#">Download</a></td>
                     <td><button onClick={() => deleteAppointment(appointment.id)}>Delete</button></td>
                 </tr>
             }</For>

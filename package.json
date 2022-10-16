@@ -27,16 +27,13 @@
   },
   "dependencies": {
     "@easepick/bundle": "^1.2.0",
-    "@hope-ui/solid": "^0.6.7",
     "@solidjs/router": "^0.5.0",
     "@stitches/core": "^1.2.8",
-    "array.prototype.group": "^1.1.1",
     "axios": "^1.1.2",
     "dayjs": "^1.11.5",
-    "solid-bootstrap": "^1.0.8",
+    "js-file-download": "^0.4.12",
+    "papaparse": "^5.3.2",
     "solid-js": "^1.5.7",
-    "solid-modal": "^0.1.4",
-    "solid-services": "^3.2.0",
-    "solid-transition-group": "^0.0.11"
+    "solid-modal": "^0.1.4"
   }
 }
