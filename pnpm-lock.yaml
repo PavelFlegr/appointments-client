@@ -21,6 +21,7 @@ specifiers:
   solid-bootstrap: ^1.0.8
   solid-js: ^1.5.7
   solid-modal: ^0.1.4
+  solid-services: ^3.2.0
   solid-transition-group: ^0.0.11
   style-loader: ^3.3.1
   webpack: ^5.74.0
@@ -38,6 +39,7 @@ dependencies:
   solid-bootstrap: 1.0.8_solid-js@1.5.7
   solid-js: 1.5.7
   solid-modal: 0.1.4
+  solid-services: 3.2.0_solid-js@1.5.7
   solid-transition-group: 0.0.11_solid-js@1.5.7
 
 devDependencies:
@@ -6777,6 +6779,14 @@ packages:
     resolution: {integrity: sha512-7i00fI2BdkI+S1wi8XIQU+tRugMU1wccF3cnTKe3om9slCdQRFeDYzBGSn4Q/wdK+JLIA5MrC0k1oKyF7ysxuA==}
     peerDependencies:
       solid-js: '>=1.2.5'
+    dependencies:
+      solid-js: 1.5.7
+    dev: false
+
+  /solid-services/3.2.0_solid-js@1.5.7:
+    resolution: {integrity: sha512-W4Ir77J7ABqtPYnuN4TXUnk7m9YWVlgPBtAEVhTtcHUFhrd8558AW06qud1d/SLA2NpOKg8MRec9fDXN563ogw==}
+    peerDependencies:
+      solid-js: ^1.0.0
     dependencies:
       solid-js: 1.5.7
     dev: false

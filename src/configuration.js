@@ -6,6 +6,7 @@ import duration from "dayjs/plugin/duration.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import TimePicker from "./timePicker.component";
 import axios from "axios"
+import {useNavigate} from "@solidjs/router";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -20,6 +21,11 @@ export default function Configuration() {
     const [message, setMessage] = createSignal(null)
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
+    const navigate = useNavigate()
+
+    function createBearer() {
+        return {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}}
+    }
 
     onMount(async () => {
         const boundsSelector = new easepick.create({
@@ -41,9 +47,12 @@ export default function Configuration() {
     })
 
     async function getAppointments() {
-        const response = await axios.get('/api/appointment')
-
-        setAppointments(response.data)
+        try {
+            const response = await axios.get('/api/appointment', createBearer())
+            setAppointments(response.data)
+        } catch(e) {
+            navigate('/login', {replace: true})
+        }
     }
 
     function addBreak() {
@@ -62,7 +71,6 @@ export default function Configuration() {
     }
 
     function formatTime(time) {
-        console.log(dayjs(time, 'HH:mm'))
         return dayjs(time, 'HH:mm').utc().format('HH:mm:ss')
     }
 
@@ -79,9 +87,14 @@ export default function Configuration() {
         }
 
         try {
-            await axios.post("api/appointment", appointment)
+            await axios.post("api/appointment", appointment, createBearer())
         } catch(e) {
-            setMessage({color: 'darkred', text: "couldn't create appointment, try again"})
+            if(e.response.status === 401) {
+                navigate('/login', {replace: true})
+            }
+            else {
+                setMessage({color: 'darkred', text: "couldn't create appointment, try again"})
+            }
         }
 
         await getAppointments()
@@ -89,8 +102,15 @@ export default function Configuration() {
     }
 
     async function deleteAppointment(id) {
-        await axios.delete(`api/appointment/${id}`)
-        await getAppointments()
+        try {
+            await axios.delete(`api/appointment/${id}`, createBearer())
+            await getAppointments()
+        } catch(e) {
+            console.log(e)
+            if(e.response.status=== 401) {
+                navigate('/login', {replace: true})
+            }
+        }
     }
 
     return <>

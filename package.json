@@ -36,6 +36,7 @@
     "solid-bootstrap": "^1.0.8",
     "solid-js": "^1.5.7",
     "solid-modal": "^0.1.4",
+    "solid-services": "^3.2.0",
     "solid-transition-group": "^0.0.11"
   }
 }
