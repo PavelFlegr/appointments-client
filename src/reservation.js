@@ -103,7 +103,7 @@ export default function Reservation() {
             <input value={lastName()} onChange={e=>setLastName(e.currentTarget.value)} type="text"></input>
         </div>
         <div>
-            <label>Email</label>
+            <label>Email (you will receive a confirmation on this address)</label>
             <input value={email()} onChange={e=>setEmail(e.currentTarget.value)} type="email"></input>
         </div>
         <h4>Reservation</h4>
