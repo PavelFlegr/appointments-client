@@ -2,10 +2,8 @@ import {useParams} from "@solidjs/router";
 import {createSignal, For, onMount, Show} from "solid-js";
 import axios from "axios";
 import dayjs from "dayjs";
-import group from 'array.prototype.group'
 import {Button, Form, Modal} from "solid-bootstrap";
 
-group.shim()
 
 export default function Reservation() {
     const params = useParams()
@@ -30,8 +28,6 @@ export default function Reservation() {
 
         return Object.keys(groups).map(date => ({date, segments: groups[date]}))
     }
-
-    const format = "DD.MM.YYYY HH:mm"
 
     async function loadSegments() {
         const result = await axios.get(`/api/segment/${params.appointmentId}`)

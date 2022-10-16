@@ -136,7 +136,7 @@ export default function Configuration() {
                     <td>{appointment.name}</td>
                     <td>{dayjs(appointment.start).format(format)}</td>
                     <td>{dayjs(appointment.end).format(format)}</td>
-                    <td><a href={`/reserve/${appointment.id}`}>link</a></td>
+                    <td><a href={`/reserve/${appointment.id}`} target="_blank">link</a></td>
                     <td><button onClick={() => deleteAppointment(appointment.id)}>Delete</button></td>
                 </tr>
             }</For>
