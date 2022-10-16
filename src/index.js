@@ -4,7 +4,6 @@ import Reservation from "./reservation";
 import Configuration from "./configuration";
 import Cancel from "./cancel";
 import Login from "./login";
-import {ServiceRegistry} from "solid-services";
 import Register from "./register";
 
 function App() {
@@ -19,4 +18,4 @@ function App() {
     );
 }
 
-render(() => <Router><ServiceRegistry><App /></ServiceRegistry></Router>, document.getElementById("app"));
+render(() => <Router><App /></Router>, document.getElementById("app"));

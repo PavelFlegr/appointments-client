@@ -2,7 +2,6 @@ import {useParams} from "@solidjs/router";
 import {createSignal, For, onMount, Show} from "solid-js";
 import axios from "axios";
 import dayjs from "dayjs";
-import {Button, Form, Modal} from "solid-bootstrap";
 
 
 export default function Reservation() {
@@ -108,8 +107,8 @@ export default function Reservation() {
         <div>{dayjs(selected().date).format('DD.MM.YYYY')}</div>
         <div>{dayjs(selected().start).format("HH:mm")} - {dayjs(selected().end).format("HH:mm")}</div>
         <div>
-            <Button onClick={finishReservation}>Confirm Reservation</Button>
-            <Button onClick={() => setShowConfirmation(false)}>Cancel</Button>
+            <button onClick={finishReservation}>Confirm Reservation</button>
+            <button onClick={() => setShowConfirmation(false)}>Cancel</button>
         </div>
     </Show>
 }
