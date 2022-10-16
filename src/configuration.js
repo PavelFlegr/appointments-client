@@ -1,5 +1,5 @@
 import {AmpPlugin, easepick, LockPlugin, RangePlugin, TimePlugin} from '@easepick/bundle';
-import {createSignal, onMount} from "solid-js";
+import {createSignal, For, onMount, Show} from "solid-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js"
 import duration from "dayjs/plugin/duration.js"
@@ -17,6 +17,7 @@ export default function Configuration() {
     const [length, setLength] = createSignal("01:00")
     const [bounds, setBounds] = createSignal({})
     const [name, setName] = createSignal("")
+    const [message, setMessage] = createSignal(null)
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
 
@@ -36,10 +37,14 @@ export default function Configuration() {
             setBounds(e.detail)
         })
 
+        await getAppointments()
+    })
+
+    async function getAppointments() {
         const response = await axios.get('/api/appointment')
 
         setAppointments(response.data)
-    })
+    }
 
     function addBreak() {
         const [breakStart, setBreakStart] = createSignal("12:00")
@@ -73,11 +78,27 @@ export default function Configuration() {
             exclude: []
         }
 
-        await axios.post("api/appointment", appointment)
+        try {
+            await axios.post("api/appointment", appointment)
+        } catch(e) {
+            setMessage({color: 'darkred', text: "couldn't create appointment, try again"})
+        }
+
+        await getAppointments()
 
     }
 
+    async function deleteAppointment(id) {
+        await axios.delete(`api/appointment/${id}`)
+        await getAppointments()
+    }
+
     return <>
+        <Show when={message()}>
+            <div style={`background-color: ${message().color}`}>
+                {message().text}
+            </div>
+        </Show>
         <label for="name">Appointment Name</label>
         <input value={name()} onChange={e => setName(e.currentTarget.value)} id="name"/>
         <label for="volume">Available spots per session</label>
@@ -89,7 +110,7 @@ export default function Configuration() {
         <input id="duration"/>
         <div>
             <h2>Breaks</h2>
-            <button onClick={addBreak}>Add break</button>
+            <button onClick={() => addBreak()}>Add break</button>
             <For each={breaks()}>{(breakData, i) =>
                 <div>
                     <TimePicker name="Start" model={breakData.start}/>
@@ -101,12 +122,25 @@ export default function Configuration() {
 
         <h1>Appointments</h1>
         <table>
+            <thead>
+            <tr>
+                <th>name</th>
+                <th>start</th>
+                <th>end</th>
+                <th>link</th>
+            </tr>
+            </thead>
+            <tbody>
             <For each={appointments()}>{(appointment, i) =>
                 <tr>
                     <td>{appointment.name}</td>
+                    <td>{dayjs(appointment.start).format(format)}</td>
+                    <td>{dayjs(appointment.end).format(format)}</td>
                     <td><a href={`/reserve/${appointment.id}`}>link</a></td>
+                    <td><button onClick={() => deleteAppointment(appointment.id)}>Delete</button></td>
                 </tr>
             }</For>
+            </tbody>
         </table>
     </>
 }
