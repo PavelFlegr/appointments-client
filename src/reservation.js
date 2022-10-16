@@ -1,7 +1,9 @@
 import {useParams} from "@solidjs/router";
 import {createSignal, For, onMount, Show} from "solid-js";
+import timezone from "dayjs/plugin/timezone.js"
 import axios from "axios";
 import dayjs from "dayjs";
+dayjs.extend(timezone)
 
 
 export default function Reservation() {
@@ -50,7 +52,8 @@ export default function Reservation() {
                 segmentId: selected().id,
                 firstName: firstName(),
                 lastName: lastName(),
-                email: email()
+                email: email(),
+                timezone: dayjs.tz.guess(),
             })
 
             setMessage({color: "darkgreen", text: "reservation created"})
