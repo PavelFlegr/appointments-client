@@ -3,6 +3,7 @@ import {createSignal, For, onMount, Show} from "solid-js";
 import timezone from "dayjs/plugin/timezone.js"
 import axios from "axios";
 import dayjs from "dayjs";
+import {Alert, Button, Card, Col, Container, Form, FormControl, FormLabel, Modal, Row, Stack} from "solid-bootstrap";
 dayjs.extend(timezone)
 
 
@@ -56,62 +57,88 @@ export default function Reservation() {
                 timezone: dayjs.tz.guess(),
             })
 
-            setMessage({color: "darkgreen", text: "reservation created"})
+            setMessage({color: "success", text: "reservation created"})
         } catch(e) {
-            setMessage({color: "darkred", text: "reservation failed, please try again"})
+            setMessage({color: "danger", text: "reservation failed, please try again"})
         } finally {
             await loadSegments()
             setShowConfirmation(false)
         }
     }
 
-    const page = <div>
+    return <Container class="text-center">
         <Show when={message()}>
-            <div style={`background-color: ${message().color}`}>
+            <Alert variant={message().color}>
                 {message().text}
-            </div>
+            </Alert>
         </Show>
         <h1>Make a reservation for {appointmentName()}</h1>
-        <For each={groupedSegments()}>{(group, i) =>
-        <>
-            <h2>{dayjs(group.date).format('DD.MM.YYYY')}</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px">
-                <For each={group.segments}>{(segment, i) =>
-                    <div style="border: 3px outset darkblue; padding: 10px; background-color: #146ebd">
-                        <div>
-                            {dayjs(segment.start).format("HH:mm")} - {dayjs(segment.end).format("HH:mm")}
-                        </div>
-                        <div>
-                            Spots Left: {segment.volume}
-                        </div>
-                        <button onClick={() => confirmReservation(segment)}>Reserve</button>
+        <Show when={groupedSegments().length} fallback={<Alert variant="info">Sorry, there are no more dates avalaible</Alert>}>
+            <For each={groupedSegments()}>{(group, i) =>
+                <>
+                    <h2>{dayjs(group.date).format('DD.MM.YYYY')}</h2>
+                    <div style="display: flex; justify-content: center; flex-wrap: wrap">
+                        <For each={group.segments}>{(segment, i) =>
+                            <Card border="primary" class="m-2" style={{ width: "14rem" }}>
+                                <Card.Header>
+                                    Spots Left: {segment.volume}
+                                </Card.Header>
+                                <Card.Body>
+                                    <Card.Title>
+                                        {dayjs(segment.start).format("HH:mm")} - {dayjs(segment.end).format("HH:mm")}
+                                    </Card.Title>
+                                    <Button onClick={() => confirmReservation(segment)}>Reserve</Button>
+                                </Card.Body>
+                            </Card>
+                        }</For>
                     </div>
-                }</For>
-            </div>
-        </>
-    }</For>
-    </div>
+                </>
+            }</For>
+        </Show>
 
-    return <Show fallback={page}  when={showConfirmation()}>
-        <h3>Finish reservation</h3>
-        <div>
-            <label>First Name</label>
-            <input value={firstName()} onChange={e=>setFirstName(e.currentTarget.value)} type="text"></input>
-        </div>
-        <div>
-            <label>Last Name</label>
-            <input value={lastName()} onChange={e=>setLastName(e.currentTarget.value)} type="text"></input>
-        </div>
-        <div>
-            <label>Email (you will receive a confirmation on this address)</label>
-            <input value={email()} onChange={e=>setEmail(e.currentTarget.value)} type="email"></input>
-        </div>
-        <h4>Reservation</h4>
-        <div>{dayjs(selected().start).format('DD.MM.YYYY')}</div>
-        <div>{dayjs(selected().start).format("HH:mm")} - {dayjs(selected().end).format("HH:mm")}</div>
-        <div>
-            <button onClick={finishReservation}>Confirm Reservation</button>
-            <button onClick={() => setShowConfirmation(false)}>Cancel</button>
-        </div>
-    </Show>
+        <Modal show={showConfirmation()} onHide={()=>setShowConfirmation(false)}>
+            <Modal.Header closeButton>
+                <Modal.Title>Finish reservation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    <Form.Group as={Row} class="mb-3">
+                        <Form.Label column sm={3}>Date</Form.Label>
+                        <Col>
+                            <Form.Control disabled value={dayjs(selected().start).format('DD.MM.YYYY')} type="text"></Form.Control>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} class="mb-3">
+                        <Form.Label column sm={3}>Time</Form.Label>
+                        <Col>
+                            <Form.Control disabled value={`${dayjs(selected().start).format("HH:mm")} - ${dayjs(selected().end).format("HH:mm")}`} type="text"></Form.Control>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} class="mb-3">
+                        <Form.Label column sm={3}>First Name</Form.Label>
+                        <Col>
+                            <Form.Control value={firstName()} onChange={e=>setFirstName(e.currentTarget.value)} type="text"></Form.Control>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} class="mb-3">
+                        <Form.Label column sm={3}>Last Name</Form.Label>
+                        <Col>
+                            <Form.Control value={lastName()} onChange={e=>setLastName(e.currentTarget.value)} type="text"></Form.Control>
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} class="mb-3">
+                        <Form.Label column sm={3}>Email</Form.Label>
+                        <Col>
+                            <Form.Control value={email()} onChange={e=>setEmail(e.currentTarget.value)} type="email"></Form.Control>
+                            <Form.Text> you will receive a confirmation on this address</Form.Text>
+                        </Col>
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button onClick={finishReservation} type="submit">Confirm Reservation</Button>
+                <Button variant="secondary" onClick={() => setShowConfirmation(false)}>Cancel</Button>
+            </Modal.Footer>
+        </Modal>
+    </Container>
 }

@@ -6,9 +6,10 @@ import duration from "dayjs/plugin/duration.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import TimePicker from "./timePicker.component";
 import axios from "axios"
-import {useNavigate} from "@solidjs/router";
+import {A, useNavigate} from "@solidjs/router";
 import fileDownload from "js-file-download";
 import Papa from "papaparse"
+import {Button, Container, Form, Table} from "solid-bootstrap";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -95,7 +96,7 @@ export default function Configuration() {
                 navigate('/login', {replace: true})
             }
             else {
-                setMessage({color: 'darkred', text: "couldn't create appointment, try again"})
+                setMessage({color: 'danger', text: "couldn't create appointment, try again"})
             }
         }
 
@@ -122,6 +123,7 @@ export default function Configuration() {
                 ...reservation,
                 start: dayjs(reservation.start).format(format),
                 end: dayjs(reservation.end).format(format),
+                cancelUrl: `${window.location.protocol}//${window.location.hostname}/cancel/${reservation.cancelUrl}`
             }))
             fileDownload(Papa.unparse(pretty), `${name}.csv`)
         } catch(e) {
@@ -129,47 +131,58 @@ export default function Configuration() {
                 navigate('/login', {replace: true})
             }
             else {
-                setMessage({color: 'darkred', text: "couldn't download reservations"})
+                setMessage({color: 'danger', text: "couldn't download reservations"})
             }
         }
     }
 
-    return <>
+    return <Container>
         <Show when={message()}>
-            <div style={`background-color: ${message().color}`}>
+            <Alert variant={message().color}>
                 {message().text}
-            </div>
+            </Alert>
         </Show>
-        <label for="name">Appointment Name</label>
-        <input value={name()} onChange={e => setName(e.currentTarget.value)} id="name"/>
-        <label for="volume">Available spots per session</label>
-        <input type="number" value={volume()} step="1" min="1" onChange={e => setVolume(parseInt(e.currentTarget.value))} id="volume"/>
-        <div>
-            <TimePicker name="Session Length" model={{time: length, setTime: setLength}}/>
-        </div>
-        <label for="duration">Select total duration</label>
-        <input id="duration" style="width: 300px"/>
-        <div>
-            <h2>Breaks</h2>
-            <button onClick={() => addBreak()}>Add break</button>
-            <For each={breaks()}>{(breakData, i) =>
-                <div>
-                    <TimePicker name="Start" model={breakData.start}/>
-                    <TimePicker name="End" model={breakData.end}/>
-                </div>
-            }</For>
-        </div>
-        <button onClick={createAppointment}>Create Appointment</button>
+        <Form style="width: 300px">
+            <Form.Group>
+                <Form.Label for="name">Appointment Name</Form.Label>
+                <Form.Control value={name()} onChange={e => setName(e.currentTarget.value)} id="name"/>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label for="volume">Available spots per session</Form.Label>
+                <Form.Control type="number" value={volume()} step="1" min="1" onChange={e => setVolume(parseInt(e.currentTarget.value))} id="volume"/>
+            </Form.Group>
+            <Form.Group>
+                <TimePicker name="Session Length" model={{time: length, setTime: setLength}}/>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label for="duration">Select total duration</Form.Label>
+                <Form.Control id="duration" style="width: 300px; background-color: initial"/>
+            </Form.Group>
+            <div class="mb-3">
+                <h2>Breaks</h2>
+                <Button class="mb-3" variant="secondary" onClick={() => addBreak()}>Add break</Button>
+                <For each={breaks()}>{(breakData, i) =>
+                    <Form.Group>
+                        <TimePicker name="Start" model={breakData.start}/>&nbsp;
+                        <TimePicker name="End" model={breakData.end}/>
+                    </Form.Group>
+                }</For>
+            </div>
+            <Button onClick={createAppointment}>Create Appointment</Button>
+        </Form>
+
 
         <h1>Appointments</h1>
-        <table>
+        <Table>
             <thead>
             <tr>
-                <th>name</th>
-                <th>start</th>
-                <th>end</th>
-                <th>link</th>
-                <th>reservations</th>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Reserved</th>
+                <th>Capacity</th>
+                <th>Link</th>
+                <th>Reservations</th>
             </tr>
             </thead>
             <tbody>
@@ -178,12 +191,14 @@ export default function Configuration() {
                     <td>{appointment.name}</td>
                     <td>{dayjs(appointment.start).format(format)}</td>
                     <td>{dayjs(appointment.end).format(format)}</td>
-                    <td><a href={`/reserve/${appointment.id}`} target="_blank">link</a></td>
-                    <td><a onClick={() => downloadReservations(appointment.id, appointment.name)} href="#">Download</a></td>
-                    <td><button onClick={() => deleteAppointment(appointment.id)}>Delete</button></td>
+                    <td>{appointment.reserved}</td>
+                    <td>{appointment.capacity}</td>
+                    <td><A href={`/reserve/${appointment.id}`} target="_blank">link</A></td>
+                    <td><A onClick={() => downloadReservations(appointment.id, appointment.name)} href="">Download</A></td>
+                    <td><Button variant="danger" onClick={() => deleteAppointment(appointment.id)}>Delete</Button></td>
                 </tr>
             }</For>
             </tbody>
-        </table>
-    </>
+        </Table>
+    </Container>
 }

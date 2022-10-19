@@ -18,6 +18,8 @@ specifiers:
   mini-css-extract-plugin: ^2.6.1
   papaparse: ^5.3.2
   prettier: ^2.7.1
+  solid-bootstrap: ^1.0.8
+  solid-bootstrap-core: ^1.0.8
   solid-js: ^1.5.7
   solid-modal: ^0.1.4
   style-loader: ^3.3.1
@@ -33,6 +35,8 @@ dependencies:
   dayjs: 1.11.5
   js-file-download: 0.4.12
   papaparse: 5.3.2
+  solid-bootstrap: 1.0.8_solid-js@1.5.7
+  solid-bootstrap-core: 1.0.8_solid-js@1.5.7
   solid-js: 1.5.7
   solid-modal: 0.1.4
 
@@ -1181,7 +1185,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.10
-    dev: true
 
   /@babel/template/7.18.10:
     resolution: {integrity: sha512-TI+rCtooWHr3QJ27kJxfjutghu44DLnasDMwpDqCXVTal9RLp3RSYNh4NdBrRP2cQAoG9A8juOQl6P6oZG4JxA==}
@@ -1533,6 +1536,10 @@ packages:
       - bluebird
       - supports-color
     dev: true
+
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
+    dev: false
 
   /@solidjs/router/0.5.0_solid-js@1.5.7:
     resolution: {integrity: sha512-rNR07l21tWWDVmCbaapggB89rEX7jlM2XChpTLqEGEnj46LzVZ8zgvjcF6NNKScByAlLpoQUkVIjB2KHpcMi+w==}
@@ -3101,6 +3108,13 @@ packages:
     dependencies:
       utila: 0.4.0
     dev: true
+
+  /dom-helpers/5.2.1:
+    resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
+    dependencies:
+      '@babel/runtime': 7.19.4
+      csstype: 3.1.1
+    dev: false
 
   /dom-serializer/1.4.1:
     resolution: {integrity: sha512-VHwB3KfrcOOkelEG2ZOfxqLZdfkil8PtJi4P8N2MMXucZq2yLp75ClViUlOVwyoHEDjYU433Aq+5zWP61+RGag==}
@@ -6022,7 +6036,6 @@ packages:
 
   /regenerator-runtime/0.13.10:
     resolution: {integrity: sha512-KepLsg4dU12hryUO7bp/axHAKvwGOCV0sGloQtpagJ12ai+ojVDqkeGSiRX1zlq+kjIMZ1t7gpze+26QqtdGqw==}
-    dev: true
 
   /regenerator-transform/0.15.0:
     resolution: {integrity: sha512-LsrGtPmbYg19bcPHwdtmXwbW+TqNvtY4riE3P83foeHRroMbH6/2ddFBfab3t7kbzc7v7p4wbkIecHImqt0QNg==}
@@ -6516,6 +6529,28 @@ packages:
       smart-buffer: 4.2.0
     dev: true
 
+  /solid-bootstrap-core/1.0.8_solid-js@1.5.7:
+    resolution: {integrity: sha512-dTENS1ZjmFq26NbE3RYOzIXziebc3Y2Cfq8K7mVWilBU+OZo8GFl3+gVxY378GX+kJYfkLGw9KyDsk+1AsKhOQ==}
+    peerDependencies:
+      solid-js: '>=1.2.5'
+    dependencies:
+      '@popperjs/core': 2.11.6
+      dom-helpers: 5.2.1
+      solid-js: 1.5.7
+      solid-react-transition: 1.0.8_solid-js@1.5.7
+    dev: false
+
+  /solid-bootstrap/1.0.8_solid-js@1.5.7:
+    resolution: {integrity: sha512-0/qJMkmq0AuQX10fdUKVKJi8mc2w4pKBZ3nPUrohCRx/iCt16CKrfHxRrzfjl0veeBOcC0obg6DbTg4HB4qQQA==}
+    peerDependencies:
+      solid-js: '>=1.2.5'
+    dependencies:
+      dom-helpers: 5.2.1
+      solid-bootstrap-core: 1.0.8_solid-js@1.5.7
+      solid-js: 1.5.7
+      solid-react-transition: 1.0.8_solid-js@1.5.7
+    dev: false
+
   /solid-js/1.5.7:
     resolution: {integrity: sha512-L1UuyMuZZARAwzXo5NZDhE6yxc14aqNbVOUoGzvlcxRZo1Cm4ExhPV0diEfwDyiKG/igqNNLkNurHkXiI5sVEg==}
     dependencies:
@@ -6524,6 +6559,14 @@ packages:
 
   /solid-modal/0.1.4:
     resolution: {integrity: sha512-W8EdnBoGNm6FYvNlFa3UY41+EqtQV9de8ryWQbloTNNC2ijazbORt48QRiggOt6z0niJedsU0cPyN5/YTcBvFQ==}
+    dev: false
+
+  /solid-react-transition/1.0.8_solid-js@1.5.7:
+    resolution: {integrity: sha512-7i00fI2BdkI+S1wi8XIQU+tRugMU1wccF3cnTKe3om9slCdQRFeDYzBGSn4Q/wdK+JLIA5MrC0k1oKyF7ysxuA==}
+    peerDependencies:
+      solid-js: '>=1.2.5'
+    dependencies:
+      solid-js: 1.5.7
     dev: false
 
   /source-map-js/1.0.2:

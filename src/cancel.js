@@ -1,6 +1,7 @@
 import {createSignal, Show} from "solid-js";
 import axios from "axios";
 import {useParams} from "@solidjs/router";
+import {Alert, Button, Container} from "solid-bootstrap";
 
 export default function Cancel() {
     const params = useParams()
@@ -11,7 +12,9 @@ export default function Cancel() {
         setCancelled(true)
     }
 
-    return <Show when={cancelled()} fallback={<button onClick={()=> cancelReservation()}>Confirm reservation cancel</button>}>
-        Reservation cancelled
-    </Show>
+    return <Container class="text-center">
+        <Show when={cancelled()} fallback={<Button variant="danger" onClick={()=> cancelReservation()}>Confirm reservation cancel</Button>}>
+            <Alert variant="success">Reservation cancelled</Alert>
+        </Show>
+    </Container>
 }

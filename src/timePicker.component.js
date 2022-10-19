@@ -1,4 +1,5 @@
 import {onMount} from "solid-js";
+import {Form, FormGroup} from "solid-bootstrap";
 
 export default function TimePicker(props) {
     let input
@@ -11,7 +12,7 @@ export default function TimePicker(props) {
     })
 
     return <>
-        <label>{props.name}</label>
-        <input value={props.model.time()} onChange={(e) => props.model.setTime(e.currentTarget.value)} ref={input}/>
+        <Form.Label>{props.name}</Form.Label>&nbsp;
+        <Form.Control style="width: 100px" value={props.model.time()} onChange={(e) => props.model.setTime(e.currentTarget.value)} ref={input}/>
     </>
 }

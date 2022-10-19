@@ -1,6 +1,7 @@
 import axios from "axios";
 import {createSignal, Show} from "solid-js";
 import {A, useNavigate} from "@solidjs/router";
+import {Alert, Button, Col, Container, Form, Row} from "solid-bootstrap";
 
 export default function Login() {
     const [email, setEmail] = createSignal('')
@@ -15,25 +16,36 @@ export default function Login() {
             navigate('/', {replace: true})
         }
         else {
-            setMessage({color: 'darkred', text: "couldn't login, please try again"})
+            setMessage({color: 'danger', text: "couldn't login, please try again"})
         }
     }
 
-    return <div>
+    return <Container style="max-width:300px">
         <Show when={message()}>
-            <div style={`background-color: ${message().color}`}>
+            <Alert variant={message().color}>
                 {message().text}
-            </div>
+            </Alert>
         </Show>
-        <div>
-            <label>Email</label>
-            <input value={email()} onInput={(e) => setEmail(e.currentTarget.value)} type='email'/>
-        </div>
-        <div>
-            <label>Password</label>
-            <input value={password()} onInput={e => setPassword(e.currentTarget.value)} type='password'/>
-        </div>
-        <button onClick={() => login()}>Login</button>
-        <A href="/register">Register</A>
-    </div>
+        <h1 class="text-center" >Login</h1>
+        <Form sm={5}>
+            <Form.Group as={Row} class="mb-3">
+                <Form.Label column sm={3}>Email</Form.Label>
+                <Col>
+                    <Form.Control value={email()} onInput={(e) => setEmail(e.currentTarget.value)} type='email'/>
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row} class="mb-3">
+                <Form.Label column sm={3}>Password</Form.Label>
+                <Col>
+                    <Form.Control value={password()} onInput={e => setPassword(e.currentTarget.value)} type='password'/>
+                </Col>
+
+            </Form.Group>
+            <Form.Group class="text-center" >
+                <Button class="me-3" onClick={() => login()}>Login</Button>
+                <A href="/register">Register</A>
+            </Form.Group>
+
+        </Form>
+    </Container>
 }
