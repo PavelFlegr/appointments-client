@@ -1,5 +1,5 @@
 import {onMount} from "solid-js";
-import {Form, FormGroup} from "solid-bootstrap";
+import {Form} from "solid-bootstrap";
 
 export default function TimePicker(props) {
     let input

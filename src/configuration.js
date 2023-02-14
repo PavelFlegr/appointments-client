@@ -9,7 +9,7 @@ import axios from "axios"
 import {A, useNavigate} from "@solidjs/router";
 import fileDownload from "js-file-download";
 import Papa from "papaparse"
-import {Button, Container, Form, Table} from "solid-bootstrap";
+import {Alert, Button, Container, Form, Table} from "solid-bootstrap";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -37,7 +37,6 @@ export default function Configuration() {
             autoApply: false,
             plugins: [RangePlugin, LockPlugin, TimePlugin, AmpPlugin],
             format,
-            TimePlugin: { stepMinutes: 1 },
             LockPlugin: { minDate: dayjs().toISOString() },
             zIndex: 20
         })
@@ -155,8 +154,11 @@ export default function Configuration() {
                 <TimePicker name="Session Length" model={{time: length, setTime: setLength}}/>
             </Form.Group>
             <Form.Group>
-                <Form.Label for="duration">Select total duration</Form.Label>
-                <Form.Control id="duration" style="width: 300px; background-color: initial"/>
+                <Form.Label>Availability</Form.Label>
+                <Form.Group>
+                    <Form.Label>Date</Form.Label>
+                    <Form.Control id="duration" style="width: 300px; background-color: initial"/>
+                </Form.Group>
             </Form.Group>
             <div class="mb-3">
                 <h2>Breaks</h2>

@@ -3,7 +3,7 @@ import {createSignal, For, onMount, Show} from "solid-js";
 import timezone from "dayjs/plugin/timezone.js"
 import axios from "axios";
 import dayjs from "dayjs";
-import {Alert, Button, Card, Col, Container, Form, FormControl, FormLabel, Modal, Row, Stack} from "solid-bootstrap";
+import {Alert, Button, Card, Col, Container, Form, Modal, Row } from "solid-bootstrap";
 dayjs.extend(timezone)
 
 
@@ -79,7 +79,7 @@ export default function Reservation() {
                     <h2>{dayjs(group.date).format('DD.MM.YYYY')}</h2>
                     <div style="display: flex; justify-content: center; flex-wrap: wrap">
                         <For each={group.segments}>{(segment, i) =>
-                            <Card border="primary" class="m-2" style={{ width: "14rem" }}>
+                            <Card border={segment.volume === 0 ?  "secondary" : "primary"} class="m-2" style={{ width: "14rem" }}>
                                 <Card.Header>
                                     Spots Left: {segment.volume}
                                 </Card.Header>
@@ -87,7 +87,7 @@ export default function Reservation() {
                                     <Card.Title>
                                         {dayjs(segment.start).format("HH:mm")} - {dayjs(segment.end).format("HH:mm")}
                                     </Card.Title>
-                                    <Button onClick={() => confirmReservation(segment)}>Reserve</Button>
+                                    <Button disabled={segment.volume === 0} onClick={() => confirmReservation(segment)}>Reserve</Button>
                                 </Card.Body>
                             </Card>
                         }</For>

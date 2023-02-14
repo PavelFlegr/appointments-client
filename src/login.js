@@ -1,6 +1,6 @@
 import axios from "axios";
 import {createSignal, Show} from "solid-js";
-import {A, useNavigate} from "@solidjs/router";
+import { useNavigate} from "@solidjs/router";
 import {Alert, Button, Col, Container, Form, Row} from "solid-bootstrap";
 
 export default function Login() {
@@ -43,7 +43,7 @@ export default function Login() {
             </Form.Group>
             <Form.Group class="text-center" >
                 <Button class="me-3" onClick={() => login()}>Login</Button>
-                <A href="/register">Register</A>
+                {/*<A href="/register">Register</A>*/}
             </Form.Group>
 
         </Form>
