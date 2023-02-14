@@ -45,6 +45,9 @@ export default function Configuration() {
             setBounds(e.detail)
         })
 
+        boundsSelector.setStartTime('8:00')
+        boundsSelector.setEndTime('16:00')
+
         await getAppointments()
     })
 
