@@ -22,6 +22,7 @@ export default function Configuration() {
     const [bounds, setBounds] = createSignal({})
     const [name, setName] = createSignal("")
     const [message, setMessage] = createSignal(null)
+    const [instructions, setInstructions] = createSignal("")
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
     const navigate = useNavigate()
@@ -88,7 +89,8 @@ export default function Configuration() {
             start: dayjs(bounds().start).utc().toISOString(),
             end: dayjs(bounds().end).utc().toISOString(),
             breaks: breaks().map(breakData => ({start: formatTime(breakData.start.time()), end: formatTime(breakData.end.time())})),
-            exclude: []
+            exclude: [],
+            instructions: instructions()
         }
 
         try {
@@ -173,6 +175,10 @@ export default function Configuration() {
                     </Form.Group>
                 }</For>
             </div>
+            <Form.Group>
+                <Form.Label>Email Instructions</Form.Label>
+                    <Form.Control as="textarea" onChange={(e) => setInstructions(e.currentTarget.value)}/>
+            </Form.Group>
             <Button onClick={createAppointment}>Create Appointment</Button>
         </Form>
 
