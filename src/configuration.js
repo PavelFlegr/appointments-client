@@ -10,6 +10,7 @@ import {A, useNavigate} from "@solidjs/router";
 import fileDownload from "js-file-download";
 import Papa from "papaparse"
 import {Alert, Button, Container, Form, Table} from "solid-bootstrap";
+import {SolidQuill} from "solid-quill";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -26,6 +27,12 @@ export default function Configuration() {
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
     const navigate = useNavigate()
+
+    let q;
+
+    const init = (quill) => {
+        console.assert(q.getText() === quill.getText());
+    };
 
     function createBearer() {
         return {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}}
@@ -175,13 +182,27 @@ export default function Configuration() {
                     </Form.Group>
                 }</For>
             </div>
-            <Form.Group>
-                <Form.Label>Email Instructions</Form.Label>
-                    <Form.Control as="textarea" onChange={(e) => setInstructions(e.currentTarget.value)}/>
-            </Form.Group>
-            <Button onClick={createAppointment}>Create Appointment</Button>
         </Form>
-
+        <Form.Group>
+            <Form.Label>Email Instructions</Form.Label>
+            <SolidQuill
+                // Bind the `Quill` instance to the parent
+                ref={q}
+                // Which element to create (default to `div`)
+                as="main"
+                // Events
+                onReady={init}
+                onTextChange={() => setInstructions(q.root.innerHTML)}
+                // Quill options
+                debug={false}
+                placeholder=""
+                style="height: 200px"
+                readOnly={false} // for now this is the only reactive props
+                theme="snow"
+                classList={{ active: true }}
+            />
+        </Form.Group>
+        <Button onClick={createAppointment}>Create Appointment</Button>
 
         <h1>Appointments</h1>
         <Table>
