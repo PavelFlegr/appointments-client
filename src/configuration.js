@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js"
 import duration from "dayjs/plugin/duration.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import TimePicker from "./timePicker.component";
+import TimePicker from "./components/time-picker.component";
 import axios from "axios"
 import {A, useNavigate} from "@solidjs/router";
 import fileDownload from "js-file-download";
@@ -12,6 +12,7 @@ import Papa from "papaparse"
 import {Alert, Button, Container, Form, Table} from "solid-bootstrap";
 import {SolidQuill} from "solid-quill";
 import {createMutable} from "solid-js/store";
+import DateRange from "./components/date-range.component";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -19,11 +20,10 @@ dayjs.extend(customParseFormat)
 
 export default function Configuration() {
     const [message, setMessage] = createSignal(null)
-    const [instructions, setInstructions] = createSignal("")
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
     const navigate = useNavigate()
-    const appointment = createMutable({ breaks: [], volume: 1, length: 60, start: '', end: '', name: "", instructions: "" })
+    const appointment = createMutable({ breaks: [], volume: 1, length: 60, bounds: { start: null, end: null }, name: "", instructions: "" })
     let q;
 
     const init = (quill) => {
@@ -35,24 +35,6 @@ export default function Configuration() {
     }
 
     onMount(async () => {
-        const boundsSelector = new easepick.create({
-            element: "#duration",
-            css: ['https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css'],
-            autoApply: false,
-            plugins: [RangePlugin, LockPlugin, TimePlugin, AmpPlugin],
-            format,
-            LockPlugin: { minDate: dayjs().toISOString() },
-            zIndex: 20
-        })
-
-        boundsSelector.on('select', e => {
-            appointment.start = e.detail.start
-            appointment.end = e.detail.end
-        })
-
-        boundsSelector.setStartTime('8:00')
-        boundsSelector.setEndTime('16:00')
-
         await getAppointments()
     })
 
@@ -77,12 +59,13 @@ export default function Configuration() {
     }
 
     async function createAppointment() {
+        console.log(appointment.start, appointment.end)
         const payload = {
             name: appointment.name,
             volume: appointment.volume,
             length: dayjs.duration({m: appointment.length}),
-            start: appointment.start,
-            end: appointment.end,
+            start: appointment.bounds.start,
+            end: appointment.bounds.end,
             breaks: appointment.breaks.map(breakData => ({start: formatTime(breakData.start), end: formatTime(breakData.end)})),
             exclude: [],
             instructions: appointment.instructions
@@ -158,7 +141,7 @@ export default function Configuration() {
                 <Form.Label>Availability</Form.Label>
                 <Form.Group>
                     <Form.Label>Date</Form.Label>
-                    <Form.Control id="duration" style="width: 300px; background-color: initial"/>
+                    <DateRange onChange={(val) => appointment.bounds = val}></DateRange>
                 </Form.Group>
             </Form.Group>
             <div class="mb-3">
@@ -166,8 +149,8 @@ export default function Configuration() {
                 <Button class="mb-3" variant="secondary" onClick={() => addBreak()}>Add break</Button>
                 <For each={appointment.breaks}>{(breakData, i) =>
                     <Form.Group>
-                        <TimePicker name="Start" model={breakData.start}/>&nbsp;
-                        <TimePicker name="End" model={breakData.end}/>
+                        <TimePicker name="Start" value={breakData.start} onChange={data => breakData.start = data}/>&nbsp;
+                        <TimePicker name="End" value={breakData.end} onChange={data => breakData.end = data}/>
                     </Form.Group>
                 }</For>
             </div>

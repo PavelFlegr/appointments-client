@@ -4,12 +4,13 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js"
 import duration from "dayjs/plugin/duration.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import TimePicker from "./timePicker.component";
+import TimePicker from "./components/time-picker.component";
 import axios from "axios"
 import {A, useNavigate, useParams} from "@solidjs/router";
 import {Alert, Button, Container, Form} from "solid-bootstrap";
 import {SolidQuill} from "solid-quill";
 import {createMutable} from "solid-js/store";
+import DateRange from "./components/date-range.component";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
@@ -18,11 +19,10 @@ dayjs.extend(customParseFormat)
 export default function Appointment() {
     const params = useParams()
     const [message, setMessage] = createSignal(null)
-    const format = "DD.MM.YYYY HH:mm"
     const navigate = useNavigate()
     let boundsSelector;
 
-    const appointment = createMutable({ breaks: [], volume: 1, length: 60, start: '', end: '', name: "", instructions: "" })
+    const appointment = createMutable({ breaks: [], volume: 1, length: 60, bounds: { start: null, end: null }, name: "", instructions: "" })
     let q;
 
     const init = (quill) => {
@@ -34,16 +34,6 @@ export default function Appointment() {
     }
 
     onMount(async () => {
-        boundsSelector = new easepick.create({
-            element: "#duration",
-            css: ['https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css'],
-            autoApply: false,
-            plugins: [RangePlugin, LockPlugin, TimePlugin, AmpPlugin],
-            format,
-            LockPlugin: { minDate: dayjs().toISOString() },
-            zIndex: 20
-        })
-
         loadAppointment(params.appointmentId)
     })
 
@@ -55,7 +45,6 @@ export default function Appointment() {
         if(data.instructions) {
             appointment.instructions = data.instructions
         }
-        boundsSelector.setDateRange(data.start, data.end)
         appointment.start = data.start
         appointment.end = data.end
         appointment.breaks = data.breaks.map(breakData => ({start: unformatTime(breakData.start), end: unformatTime(breakData.end)}))
@@ -63,11 +52,11 @@ export default function Appointment() {
     }
 
     function formatTime(time) {
-        return dayjs(time, 'HH:mm').format('HH:mm:ss')
+        return dayjs(time, 'HH:mm').utc().format('HH:mm:ss')
     }
 
     function unformatTime(time) {
-        return dayjs(time, 'HH:mm:ss').format('HH:mm')
+        return dayjs(time, 'HH:mm:ss').utc(true).tz(dayjs.tz.guess()).format('HH:mm')
     }
 
     async function saveAppointment() {
@@ -120,15 +109,15 @@ export default function Appointment() {
                 <Form.Label>Availability</Form.Label>
                 <Form.Group>
                     <Form.Label>Date</Form.Label>
-                    <Form.Control disabled id="duration" style="width: 300px"/>
+                    <DateRange disabled={true} value={appointment.bounds} />
                 </Form.Group>
             </Form.Group>
             <div class="mb-3">
                 <h2>Breaks</h2>
                 <For each={appointment.breaks}>{(breakData, i) =>
                     <Form.Group>
-                        <TimePicker disabled={true} name="Start" model={breakData.start}/>&nbsp;
-                        <TimePicker disabled={true} name="End" model={breakData.end}/>
+                        <TimePicker disabled={true} name="Start" value={breakData.start}/>&nbsp;
+                        <TimePicker disabled={true} name="End" value={breakData.end}/>
                     </Form.Group>
                 }</For>
             </div>

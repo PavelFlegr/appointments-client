@@ -2,9 +2,9 @@ import {onMount} from "solid-js";
 import {Form} from "solid-bootstrap";
 
 export default function TimePicker(props) {
-    let model = props.model
     let disabled = props.disabled ?? false
     let input
+    let onChange = props.onChange ?? (() => {})
 
     onMount(() => {
         $(input).clockTimePicker({
@@ -15,6 +15,6 @@ export default function TimePicker(props) {
 
     return <>
         <Form.Label>{props.name}</Form.Label>&nbsp;
-        <Form.Control disabled={disabled} style="width: 100px" value={props.model} onChange={(e) => props.model = e.currentTarget.value} ref={input}/>
+        <Form.Control value={props.value} disabled={disabled} style="width: 100px" onChange={(e) => onChange(e.currentTarget.value)} ref={input}/>
     </>
 }
