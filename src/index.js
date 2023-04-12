@@ -5,6 +5,7 @@ import Configuration from "./configuration";
 import Cancel from "./cancel";
 import Login from "./login";
 import Register from "./register";
+import Appointment from "./appointment";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
             <Route path="/login" component={Login}/>
             <Route path="/register" component={Register}/>
             <Route path="/" component={Configuration}/>
+            <Route path="/appointment/:appointmentId" component={Appointment}></Route>
         </Routes>
     );
 }

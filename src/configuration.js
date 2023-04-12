@@ -11,23 +11,19 @@ import fileDownload from "js-file-download";
 import Papa from "papaparse"
 import {Alert, Button, Container, Form, Table} from "solid-bootstrap";
 import {SolidQuill} from "solid-quill";
+import {createMutable} from "solid-js/store";
 
 dayjs.extend(utc)
 dayjs.extend(duration)
 dayjs.extend(customParseFormat)
 
 export default function Configuration() {
-    const [breaks, setBreaks] = createSignal([])
-    const [volume, setVolume] = createSignal(1)
-    const [length, setLength] = createSignal("01:00")
-    const [bounds, setBounds] = createSignal({})
-    const [name, setName] = createSignal("")
     const [message, setMessage] = createSignal(null)
     const [instructions, setInstructions] = createSignal("")
     const format = "DD.MM.YYYY HH:mm"
     const [appointments, setAppointments] = createSignal([])
     const navigate = useNavigate()
-
+    const appointment = createMutable({ breaks: [], volume: 1, length: 60, start: '', end: '', name: "", instructions: "" })
     let q;
 
     const init = (quill) => {
@@ -50,7 +46,8 @@ export default function Configuration() {
         })
 
         boundsSelector.on('select', e => {
-            setBounds(e.detail)
+            appointment.start = e.detail.start
+            appointment.end = e.detail.end
         })
 
         boundsSelector.setStartTime('8:00')
@@ -69,18 +66,10 @@ export default function Configuration() {
     }
 
     function addBreak() {
-        const [breakStart, setBreakStart] = createSignal("12:00")
-        const [breakEnd, setBreakEnd] = createSignal("13:00")
-        setBreaks([...breaks(), {
-            start: {
-                time: breakStart,
-                setTime: setBreakStart,
-            },
-            end: {
-                time: breakEnd,
-                setTime: setBreakEnd,
-            },
-        }])
+        appointment.breaks.push({
+            start: '12:00',
+            end: '13:00'
+        })
     }
 
     function formatTime(time) {
@@ -88,20 +77,19 @@ export default function Configuration() {
     }
 
     async function createAppointment() {
-        const [h, m] = length().split(":")
-        const appointment = {
-            name: name(),
-            volume: volume(),
-            length: dayjs.duration({h, m}),
-            start: dayjs(bounds().start).utc().toISOString(),
-            end: dayjs(bounds().end).utc().toISOString(),
-            breaks: breaks().map(breakData => ({start: formatTime(breakData.start.time()), end: formatTime(breakData.end.time())})),
+        const payload = {
+            name: appointment.name,
+            volume: appointment.volume,
+            length: dayjs.duration({m: appointment.length}),
+            start: appointment.start,
+            end: appointment.end,
+            breaks: appointment.breaks.map(breakData => ({start: formatTime(breakData.start), end: formatTime(breakData.end)})),
             exclude: [],
-            instructions: instructions()
+            instructions: appointment.instructions
         }
 
         try {
-            await axios.post("api/appointment", appointment, createBearer())
+            await axios.post("api/appointment", payload, createBearer())
         } catch(e) {
             if(e.response.status === 401) {
                 navigate('/login', {replace: true})
@@ -156,14 +144,15 @@ export default function Configuration() {
         <Form style="width: 300px">
             <Form.Group>
                 <Form.Label for="name">Appointment Name</Form.Label>
-                <Form.Control value={name()} onChange={e => setName(e.currentTarget.value)} id="name"/>
+                <Form.Control value={appointment.name} onChange={e => appointment.name = e.currentTarget.value} id="name"/>
             </Form.Group>
             <Form.Group>
                 <Form.Label for="volume">Available spots per session</Form.Label>
-                <Form.Control type="number" value={volume()} step="1" min="1" onChange={e => setVolume(parseInt(e.currentTarget.value))} id="volume"/>
+                <Form.Control type="number" value={appointment.volume} step="1" min="1" onChange={e => appointment.volume = parseInt(e.currentTarget.value)} id="volume"/>
             </Form.Group>
             <Form.Group>
-                <TimePicker name="Session Length" model={{time: length, setTime: setLength}}/>
+                <Form.Label for="length">Session length in minutes</Form.Label>
+                <Form.Control type="number" step="1" min="1" name="Session Length" value={appointment.length} onChange={e => appointment.length = parseFloat(e.currentTarget.value)} id="length"/>
             </Form.Group>
             <Form.Group>
                 <Form.Label>Availability</Form.Label>
@@ -175,7 +164,7 @@ export default function Configuration() {
             <div class="mb-3">
                 <h2>Breaks</h2>
                 <Button class="mb-3" variant="secondary" onClick={() => addBreak()}>Add break</Button>
-                <For each={breaks()}>{(breakData, i) =>
+                <For each={appointment.breaks}>{(breakData, i) =>
                     <Form.Group>
                         <TimePicker name="Start" model={breakData.start}/>&nbsp;
                         <TimePicker name="End" model={breakData.end}/>
@@ -192,7 +181,7 @@ export default function Configuration() {
                 as="main"
                 // Events
                 onReady={init}
-                onTextChange={() => setInstructions(q.root.innerHTML)}
+                onTextChange={() => appointment.instructions = q.root.innerHTML}
                 // Quill options
                 debug={false}
                 placeholder=""
@@ -227,6 +216,7 @@ export default function Configuration() {
                     <td>{appointment.capacity}</td>
                     <td><A href={`/reserve/${appointment.id}`} target="_blank">link</A></td>
                     <td><A onClick={() => downloadReservations(appointment.id, appointment.name)} href="">Download</A></td>
+                    <td><A href={`/appointment/${appointment.id}`}>Edit</A></td>
                     <td><Button variant="danger" onClick={() => deleteAppointment(appointment.id)}>Delete</Button></td>
                 </tr>
             }</For>
