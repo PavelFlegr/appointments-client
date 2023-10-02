@@ -20,6 +20,8 @@ export default function Appointment() {
     const params = useParams()
     const [message, setMessage] = createSignal(null)
     const navigate = useNavigate()
+    const [cancelInput, setCancelInput] = createSignal('')
+    const [cancelResponse, setCancelResponse] = createSignal('')
     let boundsSelector;
 
     const appointment = createMutable({ breaks: [], volume: 1, length: 60, bounds: { start: null, end: null }, name: "", instructions: "" })
@@ -34,8 +36,14 @@ export default function Appointment() {
     }
 
     onMount(async () => {
-        loadAppointment(params.appointmentId)
+        await loadAppointment(params.appointmentId)
     })
+
+    async function cancelReservation(e) {
+        e.preventDefault()
+        const response = await axios.delete(`/api/appointment/${params.appointmentId}/reservation?email=${cancelInput()}`, createBearer())
+        setCancelResponse(response.data)
+    }
 
     async function loadAppointment(appointmentId) {
         const {data} = await axios.get(`/api/appointment/${appointmentId}`, createBearer())
@@ -143,5 +151,17 @@ export default function Appointment() {
         </Form.Group>
         <Button onClick={saveAppointment}>Save Appointment</Button>
         <A href="/">Cancel</A>
+        <h2>Cancel reservation for email</h2>
+        <Form onsubmit={cancelReservation} style="width: 300px">
+            <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control value={cancelInput()} onChange={e => setCancelInput(e.currentTarget.value)} type="email"></Form.Control>
+            </Form.Group>
+
+            <Button type="button" onClick={cancelReservation}>Cancel Reservation</Button>
+        </Form>
+        <Show when={cancelResponse() !== ''}>
+            Found and canceled {cancelResponse()} reservations
+        </Show>
     </Container>
 }
