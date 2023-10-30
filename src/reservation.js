@@ -18,6 +18,8 @@ export default function Reservation() {
     const [email, setEmail] = createSignal("")
     const [message, setMessage] = createSignal(null)
     const [appointmentName, setAppointmentName] = createSignal(null)
+    const [free, setFree] = createSignal(null)
+    const [total, setTotal] = createSignal(null)
     const groupedSegments = () => {
         const groups = {}
         segments().forEach(segment => {
@@ -36,6 +38,8 @@ export default function Reservation() {
 
         setSegments(result.data.segments)
         setAppointmentName(result.data.appointment)
+        setFree(result.data.free)
+        setTotal(result.data.total)
     }
 
     onMount(async () => {
@@ -72,7 +76,7 @@ export default function Reservation() {
                 {message().text}
             </Alert>
         </Show>
-        <h1>Make a reservation for {appointmentName()}</h1>
+        <h1>Make a reservation for {appointmentName()} ({free()}/{total()} spots available)</h1>
         <Show when={groupedSegments().length} fallback={<Alert variant="info">Sorry, there are no more dates avalaible</Alert>}>
             <For each={groupedSegments()}>{(group, i) =>
                 <>
